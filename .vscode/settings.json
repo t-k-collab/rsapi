@@ -1,0 +1,38 @@
+{
+  "[rust]": {
+    "editor.formatOnSave": true
+  },
+  "rust-analyzer.checkOnSave.command": "clippy",
+  "rust-analyzer.checkOnSave.extraArgs": ["--", "-A", "clippy::needless_return"],
+  "todo-tree.general.tags": ["FIXME", "NOTE", "TODO", "CHECK", "REFACTOR"],
+  "todo-tree.highlights.defaultHighlight": {
+    "gutterIcon": true
+  },
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon": "check-circle-fill",
+      "foreground": "#D4AC0D",
+      "iconColour": "#D4AC0D"
+    },
+    "FIXME": {
+      "icon": "flame",
+      "foreground": "red",
+      "iconColour": "red"
+    },
+    "NOTE": {
+      "icon": "paintbrush",
+      "foreground": "#00bfff",
+      "iconColour": "#00bfff"
+    },
+    "CHECK": {
+      "icon": "plus-circle",
+      "foreground": "green",
+      "iconColour": "green"
+    },
+    "REFACTOR": {
+      "icon": "code-review",
+      "foreground": "#F39C12",
+      "iconColour": "#F39C12"
+    }
+  },
+}
