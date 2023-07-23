@@ -1,10 +1,18 @@
-use axum::{http::StatusCode, Json};
+use axum::{
+    http::StatusCode,
+    routing::{get, post},
+    Json, Router,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-// use axum::handler::Handler;
 
-pub async fn health_check() {
-    // || async "Hello, World!"
+pub fn init_router() -> Router {
+    Router::new()
+        .route("/", get(health_check))
+        .route("/members", post(create_member))
+}
+
+async fn health_check() {
     {
         let _ = Json(json!({ "healthCheck": "ok" }));
     }
@@ -26,7 +34,7 @@ pub struct CreateMember {
     id: u16,
 }
 
-pub async fn create_member(Json(payload): Json<CreateMember>) -> (StatusCode, Json<Member>) {
+async fn create_member(Json(payload): Json<CreateMember>) -> (StatusCode, Json<Member>) {
     println!("{}", payload.id);
     let member = Member {
         id: payload.id,

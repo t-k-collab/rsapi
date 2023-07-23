@@ -1,23 +1,14 @@
-use axum::{
-    // http::StatusCode,
-    // response::IntoResponse,
-    routing::{get, post},
-    Router,
-};
 use dotenv::dotenv;
 use std::env;
 
 mod infrastructures;
+use infrastructures::router::init_router;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    use infrastructures::router;
-
-    let app = Router::new()
-        .route("/", get(router::health_check))
-        .route("/members", post(router::create_member));
+    let app = init_router();
 
     let address = env::var("ADDRESS").unwrap_or("".to_string());
     axum::Server::bind(&address.parse().unwrap())
