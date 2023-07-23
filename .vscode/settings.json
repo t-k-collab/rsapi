@@ -4,6 +4,9 @@
   },
   "rust-analyzer.checkOnSave.command": "clippy",
   "rust-analyzer.checkOnSave.extraArgs": ["--", "-A", "clippy::needless_return"],
+  "rust-analyzer.linkedProjects": [
+    "./Cargo.toml"
+  ],
   "todo-tree.general.tags": ["FIXME", "NOTE", "TODO", "CHECK", "REFACTOR"],
   "todo-tree.highlights.defaultHighlight": {
     "gutterIcon": true
