@@ -40,3 +40,24 @@ pub async fn create_member(Json(payload): Json<CreateMember>) -> (StatusCode, Js
 
     (StatusCode::CREATED, Json(member))
 }
+
+// remove here.
+#[cfg(test)]
+mod tests {
+    use super::{CreateMember, Member};
+
+    #[test]
+    fn test_sample() {
+        let req_body = CreateMember { id: 2 };
+        let expected = Member {
+            id: 2,
+            familyName: "Api".to_string(),
+            lastName: "Rust".to_string(),
+            middleName: "mid".to_string(),
+            passCode: "passcode".to_string(),
+            created: "20230720".to_string(),
+            updated: "20230720".to_string(),
+        };
+        assert_eq!(req_body.id, expected.id);
+    }
+}
