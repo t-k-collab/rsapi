@@ -6,7 +6,9 @@ use axum::{
 use serde_json::json;
 
 use crate::{
-    entities::member::MemberEntity, interfaces::input_data::create_member::CreateMemberInputData,
+    entities::member::MemberEntity,
+    interfaces::controllers::members::create_member::CreateMemberController,
+    use_cases::members::create_member::CreateMemberInputData,
 };
 
 pub fn init_router() -> Router {
@@ -32,14 +34,14 @@ async fn create_member(
         payload.pass_code
     );
 
-    let member = MemberEntity::new(
+    let output_data = CreateMemberController::create_member(
         payload.family_name,
         payload.middle_name,
         payload.last_name,
         payload.pass_code,
     );
 
-    (StatusCode::CREATED, Json(member))
+    (StatusCode::CREATED, Json(output_data.member))
 }
 
 // remove here.

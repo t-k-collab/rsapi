@@ -4,6 +4,7 @@ use std::env;
 mod entities;
 mod infrastructures;
 mod interfaces;
+mod use_cases;
 use infrastructures::router::init_router;
 
 #[tokio::main]

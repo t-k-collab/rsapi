@@ -7,8 +7,8 @@ pub struct MemberEntity {
     pub middle_name: String,
     pub last_name: String,
     pub pass_code: String,
-    pub created: String, // TODO date type. time or chrono crate.
-    pub updated: String, // TODO date type. time or chrono crate.
+    pub created: String, // TODO date type. time or chrono crate. // TODO this is only for model.
+    pub updated: String, // TODO date type. time or chrono crate. // TODO this is only for model.
 }
 
 impl MemberEntity {
