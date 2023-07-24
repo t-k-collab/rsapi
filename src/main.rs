@@ -1,7 +1,9 @@
 use dotenv::dotenv;
 use std::env;
 
+mod entities;
 mod infrastructures;
+mod interfaces;
 use infrastructures::router::init_router;
 
 #[tokio::main]

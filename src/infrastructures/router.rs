@@ -3,8 +3,11 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use serde::{Deserialize, Serialize};
 use serde_json::json;
+
+use crate::{
+    entities::member::MemberEntity, interfaces::input_data::create_member::CreateMemberInputData,
+};
 
 pub fn init_router() -> Router {
     Router::new()
@@ -18,33 +21,23 @@ async fn health_check() {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Member {
-    id: u16,
-    familyName: String,
-    lastName: String,
-    middleName: String,
-    passCode: String,
-    created: String,
-    updated: String,
-}
+async fn create_member(
+    Json(payload): Json<CreateMemberInputData>,
+) -> (StatusCode, Json<MemberEntity>) {
+    println!(
+        "{}, {:?}, {}, {}",
+        payload.family_name,
+        Some(&payload.middle_name),
+        payload.last_name,
+        payload.pass_code
+    );
 
-#[derive(Deserialize)]
-pub struct CreateMember {
-    id: u16,
-}
-
-async fn create_member(Json(payload): Json<CreateMember>) -> (StatusCode, Json<Member>) {
-    println!("{}", payload.id);
-    let member = Member {
-        id: payload.id,
-        familyName: "Api".to_string(),
-        lastName: "Rust".to_string(),
-        middleName: "mid".to_string(),
-        passCode: "passcode".to_string(),
-        created: "20230720".to_string(),
-        updated: "20230720".to_string(),
-    };
+    let member = MemberEntity::new(
+        payload.family_name,
+        payload.middle_name,
+        payload.last_name,
+        payload.pass_code,
+    );
 
     (StatusCode::CREATED, Json(member))
 }
@@ -52,20 +45,22 @@ async fn create_member(Json(payload): Json<CreateMember>) -> (StatusCode, Json<M
 // remove here.
 #[cfg(test)]
 mod tests {
-    use super::{CreateMember, Member};
+    use super::{CreateMemberInputData, MemberEntity};
 
     #[test]
     fn test_sample() {
-        let req_body = CreateMember { id: 2 };
-        let expected = Member {
-            id: 2,
-            familyName: "Api".to_string(),
-            lastName: "Rust".to_string(),
-            middleName: "mid".to_string(),
-            passCode: "passcode".to_string(),
-            created: "20230720".to_string(),
-            updated: "20230720".to_string(),
+        let req_body = CreateMemberInputData {
+            family_name: "Api".to_string(),
+            middle_name: Some("mid".to_string()),
+            last_name: "Rust".to_string(),
+            pass_code: "passcode".to_string(),
         };
-        assert_eq!(req_body.id, expected.id);
+        let expected = MemberEntity::new(
+            "Api".to_string(),
+            Some("mid".to_string()),
+            "Rust".to_string(),
+            "passcode".to_string(),
+        );
+        assert_eq!(req_body.family_name, expected.family_name);
     }
 }
