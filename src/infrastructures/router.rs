@@ -17,15 +17,15 @@ pub fn init_router() -> Router {
         .route("/members", post(create_member))
 }
 
+type ApiResponse<T> = (StatusCode, Json<T>);
+
 async fn health_check() {
     {
         let _ = Json(json!({ "healthCheck": "ok" }));
     }
 }
 
-async fn create_member(
-    Json(payload): Json<CreateMemberInputData>,
-) -> (StatusCode, Json<MemberEntity>) {
+async fn create_member(Json(payload): Json<CreateMemberInputData>) -> ApiResponse<MemberEntity> {
     println!(
         "{}, {:?}, {}, {}",
         payload.family_name,
