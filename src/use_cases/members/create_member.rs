@@ -1,19 +1,36 @@
 use serde::{Deserialize, Serialize};
 
-use crate::entities::member::MemberEntity;
+use crate::{
+    entities::member::MemberEntity,
+    interfaces::repositories::members::create_member_repository::CreateMemberRepository,
+};
 
 // DTO<Input> validation should be here?
 #[derive(Deserialize)]
 pub struct CreateMemberInputData {
     pub family_name: String,
-    pub middle_name: Option<String>,
-    pub last_name: String,
+    pub middle_name: String,
+    pub first_name: String,
     pub pass_code: String,
-    // pub email: String // TODO Value Object.
+    // pub email: Email // TODO Value Object.
 }
 
-// validation trait, impl
-// trait and impl CreateMemberInputData() {}
+// validation, initializing
+impl CreateMemberInputData {
+    pub fn new(
+        family_name: String,
+        middle_name: Option<String>,
+        first_name: String,
+        pass_code: String,
+    ) -> Self {
+        Self {
+            family_name,
+            middle_name: middle_name.unwrap_or_default(), // Application Logic.
+            first_name,
+            pass_code,
+        }
+    }
+}
 
 // DTO<Output>
 #[derive(Debug, Serialize)]
@@ -22,21 +39,25 @@ pub struct CreateMemberOutputData {
 }
 
 // Use Case implementation
-pub struct CreateMemberInteractor {}
+pub struct CreateMemberInteractor {
+    pub repo: CreateMemberRepository,
+}
 
 impl CreateMemberInteractor {
-    pub fn create_member(input_data: CreateMemberInputData) -> CreateMemberOutputData {
-        // TODO Dependency Inversion
-        // TODO crate data on DB and fetch them.
-        let fn_from_db = input_data.family_name;
-        let ml_from_db = input_data.middle_name;
-        let ln_from_db = input_data.last_name;
-        let pc_from_db = input_data.pass_code;
+    pub fn create_member(&self, input_data: CreateMemberInputData) -> CreateMemberOutputData {
+        // Dependency Inversion
 
-        let member_entity = MemberEntity::new(fn_from_db, ml_from_db, ln_from_db, pc_from_db);
+        let model = self.repo.create(input_data);
 
-        CreateMemberOutputData {
-            member: member_entity,
-        }
+        // TODO convert model to entity;
+        let member = MemberEntity::new(
+            model.member_id,
+            model.family_name,
+            model.middle_name,
+            model.first_name,
+            model.pass_code,
+        );
+
+        CreateMemberOutputData { member }
     }
 }
