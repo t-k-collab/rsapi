@@ -1,5 +1,8 @@
-use crate::use_cases::members::create_member::{
-    CreateMemberInputData, CreateMemberInteractor, CreateMemberOutputData,
+use crate::{
+    interfaces::repositories::members::create_member_repository::CreateMemberRepository,
+    use_cases::members::create_member::{
+        CreateMemberInputData, CreateMemberInteractor, CreateMemberOutputData,
+    },
 };
 
 pub struct CreateMemberController {}
@@ -8,22 +11,16 @@ impl CreateMemberController {
     pub fn create_member(
         family_name: String,
         middle_name: Option<String>,
-        last_name: String,
+        first_name: String,
         pass_code: String,
     ) -> CreateMemberOutputData {
-        // TODO implement correctly.
-        // validated input_data
-        let input_data = CreateMemberInputData {
-            family_name,
-            middle_name,
-            last_name,
-            pass_code,
-        };
+        let input_data =
+            CreateMemberInputData::new(family_name, middle_name, first_name, pass_code);
+
+        let repo = CreateMemberRepository {};
+        let use_case = CreateMemberInteractor { repo };
 
         // return output_data
-        CreateMemberInteractor::create_member(input_data)
+        use_case.create_member(input_data)
     }
 }
-
-// trait PrimitiveNum: Copy + Clone + Eq + Ord + PartialEq + PartialOrd {}
-// impl<T: Copy + Clone + Eq + Ord + PartialEq + PartialOrd> PrimitiveNum for T {}
