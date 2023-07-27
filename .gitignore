@@ -17,3 +17,9 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+# VSCode extensions
+client.http
+
+# ENV
+.env
