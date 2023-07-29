@@ -11,3 +11,10 @@ cargo install cargo-watch
 `cargo watch -x run`
 
 `cargo watch -x test`
+
+
+### Docker
+
+``` sh
+docker-compose up api
+```
