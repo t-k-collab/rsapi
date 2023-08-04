@@ -18,3 +18,9 @@ cargo install cargo-watch
 ``` sh
 docker-compose up api
 ```
+
+### PostgreSQL
+
+#### Local
+
+`brew services start/stop/restart postgresql@14`
