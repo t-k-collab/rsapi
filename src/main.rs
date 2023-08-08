@@ -1,14 +1,11 @@
 use dotenv::dotenv;
 use std::env;
 
-use sqlx::{self, postgres::PgPoolOptions};
-// use postgres::PgConnection;
-// use sqlx;
-
 mod entities;
 mod infrastructures;
 mod interfaces;
 mod use_cases;
+use crate::infrastructures::dbs::psql::connection::create_pool_connection;
 use infrastructures::router::init_router;
 
 #[tokio::main]
@@ -18,15 +15,7 @@ async fn main() {
     let app = init_router();
 
     let database_url = env::var("DATABASE_URL").unwrap_or("".to_string());
-    let pool_connection = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await;
-
-    let pool = match pool_connection {
-        Ok(pool) => pool,
-        Err(err) => panic!("Connection failure: {:?}", err),
-    };
+    let pool = create_pool_connection(database_url).await;
 
     let row = sqlx::query("SELECT * FROM families").execute(&pool).await;
     println!("{:?}", row);
