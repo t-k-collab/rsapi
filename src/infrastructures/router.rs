@@ -4,7 +4,6 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use serde_json::json;
 use sqlx::{PgPool, Pool, Postgres};
 
 use crate::{
@@ -25,13 +24,23 @@ type ApiResponse<T> = (StatusCode, Json<T>);
 
 async fn health_check(State(pool): State<PgPool>) {
     {
-        let row = sqlx::query("SELECT * FROM families").execute(&pool).await;
-        println!("{:?}", row);
-        let _ = Json(json!({ "healthCheck": "ok" }));
+        let row = sqlx::query!("SELECT * FROM families")
+            .fetch_all(&pool)
+            .await;
+
+        let result = match row {
+            Ok(res) => (StatusCode::OK, Json(res)),
+            Err(msg) => panic!("{:?}", msg),
+        };
+        let a = &result.1;
+        println!("{:#?}", a);
     }
 }
 
-async fn create_member(Json(payload): Json<CreateMemberInputData>) -> ApiResponse<MemberEntity> {
+async fn create_member(
+    State(pool): State<PgPool>,
+    Json(payload): Json<CreateMemberInputData>,
+) -> ApiResponse<MemberEntity> {
     println!(
         "payload: {}, {:?}, {}, {}",
         payload.family_name,

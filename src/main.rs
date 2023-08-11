@@ -18,9 +18,6 @@ async fn main() {
     // let app = init_router();
     let app = init_router(pool);
 
-    // let row = sqlx::query("SELECT * FROM families").execute(&pool).await;
-    // println!("{:?}", row);
-
     let address = env::var("ADDRESS").unwrap_or("".to_string());
     axum::Server::bind(&address.parse().unwrap())
         .serve(app.into_make_service())
