@@ -12,13 +12,14 @@ use infrastructures::router::init_router;
 async fn main() {
     dotenv().ok();
 
-    let app = init_router();
-
     let database_url = env::var("DATABASE_URL").unwrap_or("".to_string());
     let pool = create_pool_connection(database_url).await;
 
-    let row = sqlx::query("SELECT * FROM families").execute(&pool).await;
-    println!("{:?}", row);
+    // let app = init_router();
+    let app = init_router(pool);
+
+    // let row = sqlx::query("SELECT * FROM families").execute(&pool).await;
+    // println!("{:?}", row);
 
     let address = env::var("ADDRESS").unwrap_or("".to_string());
     axum::Server::bind(&address.parse().unwrap())

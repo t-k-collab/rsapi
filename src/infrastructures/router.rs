@@ -1,9 +1,11 @@
 use axum::{
+    extract::State,
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
 use serde_json::json;
+use sqlx::{PgPool, Pool, Postgres};
 
 use crate::{
     entities::member::MemberEntity,
@@ -11,16 +13,20 @@ use crate::{
     use_cases::members::create_member::CreateMemberInputData,
 };
 
-pub fn init_router() -> Router {
+pub fn init_router(pool: Pool<Postgres>) -> Router {
+    // pub fn init_router() -> Router {
     Router::new()
         .route("/", get(health_check))
         .route("/members", post(create_member))
+        .with_state(pool)
 }
 
 type ApiResponse<T> = (StatusCode, Json<T>);
 
-async fn health_check() {
+async fn health_check(State(pool): State<PgPool>) {
     {
+        let row = sqlx::query("SELECT * FROM families").execute(&pool).await;
+        println!("{:?}", row);
         let _ = Json(json!({ "healthCheck": "ok" }));
     }
 }
