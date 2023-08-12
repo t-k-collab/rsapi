@@ -14,13 +14,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    environment: 
+      name: dev
+
     steps:
     - uses: actions/checkout@v3
-      with:
-        environment: dev
-        working_directory: ./
-        DATABASE_URL: ${{ vars.DATABASE_URL  }}
     - name: Build
+      env:
+        DATABASE_URL: ${{ vars.DATABASE_URL  }}
       run: |
         cargo install sqlx-cli
         cargo sqlx prepare --database-url $DATABASE_URL
