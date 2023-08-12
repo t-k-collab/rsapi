@@ -6,19 +6,26 @@ on:
   pull_request:
     branches: [ "dev", "main" ]
 
-env:
-  CARGO_TERM_COLOR: always
+# CHOOSE ENVIRONMENT
+# env:
+#   CARGO_TERM_COLOR: always
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
+    environment: 
+      name: dev
+
     steps:
     - uses: actions/checkout@v3
     - name: Build
+      # USE ENVIRONMENT
+      # env:
+      #   DATABASE_URL: ${{ vars.DATABASE_URL  }}
       run: |
-        cargo install sqlx-cli
+        cargo install sqlx-cli --no-default-features --features rustls,postgres
         cargo sqlx prepare
         cargo build --verbose 
     - name: Run tests

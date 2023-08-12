@@ -38,7 +38,7 @@ async fn health_check(State(pool): State<PgPool>) {
 }
 
 async fn create_member(
-    State(pool): State<PgPool>,
+    State(_pool): State<PgPool>,
     Json(payload): Json<CreateMemberInputData>,
 ) -> ApiResponse<MemberEntity> {
     println!(
