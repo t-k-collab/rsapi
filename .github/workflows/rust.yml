@@ -24,7 +24,7 @@ jobs:
         DATABASE_URL: ${{ vars.DATABASE_URL  }}
       run: |
         cargo install sqlx-cli --no-default-features --features rustls,postgres
-        cargo sqlx prepare --database-url $DATABASE_URL
-        SQLX_OFFLINE=true cargo build --verbose 
+        SQLX_OFFLINE=true cargo sqlx prepare
+        cargo build --verbose 
     - name: Run tests
       run: cargo test --verbose
