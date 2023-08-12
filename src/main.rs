@@ -15,7 +15,6 @@ async fn main() {
     let database_url = env::var("DATABASE_URL").unwrap_or("".to_string());
     let pool = create_pool_connection(database_url).await;
 
-    // let app = init_router();
     let app = init_router(pool);
 
     let address = env::var("ADDRESS").unwrap_or("".to_string());
