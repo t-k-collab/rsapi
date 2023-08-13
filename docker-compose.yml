@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ./
+      target: 'builder'
+    container_name: rsapi
+    command: sh -c "cargo watch -x run"
+    # command: sh -c "cargo run"
+    tty: true
+    working_dir: '/src'
+    volumes:
+      - .:/src/:cached
+    expose:
+      - '8080'
+    ports:
+      - '8080:8000'
