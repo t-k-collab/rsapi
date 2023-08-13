@@ -13,7 +13,6 @@ use crate::{
 };
 
 pub fn init_router(pool: Pool<Postgres>) -> Router {
-    // pub fn init_router() -> Router {
     Router::new()
         .route("/", get(health_check))
         .route("/members", post(create_member))

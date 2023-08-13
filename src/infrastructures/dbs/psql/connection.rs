@@ -10,5 +10,4 @@ pub async fn create_pool_connection(database_url: String) -> Pool<Postgres> {
         Ok(pool) => pool,
         Err(err) => panic!("Connection failure: {:?}", err),
     };
-    // return pool;
 }
