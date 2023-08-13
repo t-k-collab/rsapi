@@ -18,3 +18,15 @@ cargo install cargo-watch
 ``` sh
 docker-compose up api
 ```
+
+### PostgreSQL
+
+#### Local
+
+`brew services start/stop/restart postgresql@14`
+
+### install sqlx-cli
+`cargo install sqlx-cli --no-default-features --features rustls,postgres`
+
+to create `.sqlx`,
+`cargo sqlx prepare`

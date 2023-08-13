@@ -1,9 +1,10 @@
 use axum::{
+    extract::State,
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
-use serde_json::json;
+use sqlx::{PgPool, Pool, Postgres};
 
 use crate::{
     entities::member::MemberEntity,
@@ -11,21 +12,34 @@ use crate::{
     use_cases::members::create_member::CreateMemberInputData,
 };
 
-pub fn init_router() -> Router {
+pub fn init_router(pool: Pool<Postgres>) -> Router {
     Router::new()
         .route("/", get(health_check))
         .route("/members", post(create_member))
+        .with_state(pool)
 }
 
 type ApiResponse<T> = (StatusCode, Json<T>);
 
-async fn health_check() {
+async fn health_check(State(pool): State<PgPool>) {
     {
-        let _ = Json(json!({ "healthCheck": "ok" }));
+        let row = sqlx::query!("SELECT * FROM families")
+            .fetch_all(&pool)
+            .await;
+
+        let result = match row {
+            Ok(res) => (StatusCode::OK, Json(res)),
+            Err(msg) => panic!("{:?}", msg),
+        };
+        let a = &result.1;
+        println!("{:#?}", a);
     }
 }
 
-async fn create_member(Json(payload): Json<CreateMemberInputData>) -> ApiResponse<MemberEntity> {
+async fn create_member(
+    State(_pool): State<PgPool>,
+    Json(payload): Json<CreateMemberInputData>,
+) -> ApiResponse<MemberEntity> {
     println!(
         "payload: {}, {:?}, {}, {}",
         payload.family_name,

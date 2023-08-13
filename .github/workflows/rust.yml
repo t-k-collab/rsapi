@@ -14,9 +14,18 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # environment: 
+    #   name: dev
+
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
+    # - name: Build
+    #   env:
+    #     DATABASE_URL: ${{ vars.DATABASE_URL  }}
+    #     SQLX_OFFLINE: true 
+    #   run: |
+    #     cargo install sqlx-cli --no-default-features --features rustls,postgres
+    #     cargo sqlx prepare
+    #     cargo build --verbose 
     - name: Run tests
       run: cargo test --verbose
