@@ -1,5 +1,9 @@
 # rsapi
 
+## Cargo test
+
+ `cargo test -v -- --nocapture`
+ 
 ## Cargo watch
 
 ### Install
