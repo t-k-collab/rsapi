@@ -11,6 +11,14 @@
   "todo-tree.highlights.defaultHighlight": {
     "gutterIcon": true
   },
+  "files.associations": {
+    ".env.development": "env",
+    ".env.production": "env",
+    ".env.development.local": "env",
+    ".env.production.local": "env",
+    ".env.test": "env",
+    ".env.local": "env"
+  },
   "todo-tree.highlights.customHighlight": {
     "TODO": {
       "icon": "check-circle-fill",
