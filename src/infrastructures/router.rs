@@ -1,15 +1,11 @@
-use std::mem;
-
 use axum::{
-    body::{self, Body, BoxBody},
     extract::{Path, State},
     http::{Error, StatusCode},
-    response::{IntoResponse, Response},
+    response::IntoResponse,
     routing::{get, post},
     Json, Router,
 };
-use serde::{Deserialize, Serialize};
-use sqlx::{postgres::types, FromRow, PgPool, Pool, Postgres, Type};
+use sqlx::{PgPool, Pool, Postgres};
 
 use crate::{
     entities::member::MemberEntity,
@@ -21,8 +17,6 @@ use crate::{
     },
     use_cases::members::{create_member::CreateMemberInputData, find_member::FindMemberInteractor},
 };
-
-use chrono::{NaiveDate, NaiveDateTime, Utc};
 
 pub fn init_router(pool: Pool<Postgres>) -> Router {
     Router::new()
