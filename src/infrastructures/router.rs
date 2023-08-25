@@ -5,6 +5,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
+use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Pool, Postgres};
 
 use crate::{
@@ -20,7 +21,7 @@ use crate::{
 
 pub fn init_router(pool: Pool<Postgres>) -> Router {
     Router::new()
-        // .route("/", get(health_check))
+        .route("/", get(health_check))
         .route("/members/:member_id", get(get_member))
         .route("/members", post(create_member))
         .with_state(pool)
@@ -28,24 +29,86 @@ pub fn init_router(pool: Pool<Postgres>) -> Router {
 
 type ApiResponse<T> = (StatusCode, Json<T>);
 
-// async fn health_check(State(pool): State<PgPool>) {
-//     {
-//         let row = sqlx::query!("SELECT * FROM members").fetch_all(&pool).await;
+// REFACTOR move this and refactor later.
+#[derive(Debug, Deserialize, Serialize)]
+struct CustomError {
+    msg: String,
+}
 
-//         let result = match row {
-//             Ok(res) => (StatusCode::OK, Json(res)),
-//             Err(msg) => panic!("{:?}", msg),
-//         };
-//         let sample: &Json<Vec<sqlx::postgres::PgRow>> = &result.1;
-//         println!("{:#?}", sample);
-//     }
-// }
+// REFACTOR move this and refactor later.
+#[derive(Debug, Deserialize, Serialize)]
+struct Res<T> {
+    res_body: Option<T>,
+    is_err: bool,
+    err: Option<CustomError>,
+}
 
-async fn get_member(
-    State(pool): State<PgPool>,
-    Path(member_id): Path<i32>,
-    // Path(first_name): Path<String>,
-) -> impl IntoResponse {
+#[derive(Debug, Deserialize, Serialize)]
+struct Body_Test {
+    str: String,
+}
+
+// TODO Change later
+async fn health_check(State(pool): State<PgPool>) -> impl IntoResponse {
+    {
+        let row = sqlx::query!("SELECT * FROM members").fetch_all(&pool).await;
+
+        let res = if row.is_err() {
+            let body = Res {
+                res_body: None,
+                is_err: true,
+                err: Some(CustomError {
+                    msg: "error".to_string(),
+                }),
+            };
+            let err_res: ApiResponse<Res<Body_Test>> = (
+                StatusCode::INTERNAL_SERVER_ERROR, // StatusCode::NOT_FOUND,
+                Json(body),
+            );
+            err_res
+        } else {
+            let result = match row.ok() {
+                Some(res) => {
+                    println!("There is something.");
+                    if res.is_empty() {
+                        let body = Res {
+                            res_body: None,
+                            is_err: false,
+                            err: None,
+                        };
+                        return (StatusCode::OK, Json(body));
+                    }
+                    let sample = &res[0]; // if there is a recode, get the first one.
+                    let a = &sample.family_name;
+
+                    let body = Res {
+                        res_body: Some(Body_Test { str: a.to_string() }),
+                        is_err: false,
+                        err: None,
+                    };
+
+                    let err_res: ApiResponse<Res<Body_Test>> = (StatusCode::OK, Json(body));
+                    err_res
+                }
+                None => {
+                    let body = Res {
+                        res_body: None,
+                        is_err: true,
+                        err: Some(CustomError {
+                            msg: "error".to_string(),
+                        }),
+                    };
+                    let err_res: ApiResponse<Res<Body_Test>> = (StatusCode::NOT_FOUND, Json(body));
+                    err_res
+                }
+            };
+            result
+        };
+        res
+    }
+}
+
+async fn get_member(State(pool): State<PgPool>, Path(member_id): Path<i32>) -> impl IntoResponse {
     {
         println!("path param member_id: {}", member_id);
 

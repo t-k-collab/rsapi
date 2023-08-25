@@ -16,6 +16,7 @@ impl FindMemberRepository {
                 .fetch_one(&self.pool)
                 .await;
         println!("result: {:#?}", row);
+        // TODO Error handling
         let member = row.unwrap();
 
         MemberModel {
