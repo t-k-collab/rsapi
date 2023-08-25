@@ -13,8 +13,13 @@ use sqlx::{postgres::types, FromRow, PgPool, Pool, Postgres, Type};
 
 use crate::{
     entities::member::MemberEntity,
-    interfaces::controllers::members::create_member::CreateMemberController,
-    use_cases::members::create_member::CreateMemberInputData,
+    interfaces::{
+        controllers::members::{
+            create_member::CreateMemberController, find_member::FindMemberController,
+        },
+        repositories::members::find_member_repository::FindMemberRepository,
+    },
+    use_cases::members::{create_member::CreateMemberInputData, find_member::FindMemberInteractor},
 };
 
 use chrono::{NaiveDate, NaiveDateTime, Utc};
@@ -27,14 +32,7 @@ pub fn init_router(pool: Pool<Postgres>) -> Router {
         .with_state(pool)
 }
 
-// type ApiResponse<T> = (StatusCode, Json<T>);
-struct ApiResponse<T>(StatusCode, Json<T>);
-
-// impl<T> IntoResponse for ApiResponse<T> {
-//     fn into_response(self) -> Response {
-//         Response::new(body::boxed(self))
-//     }
-// }
+type ApiResponse<T> = (StatusCode, Json<T>);
 
 // async fn health_check(State(pool): State<PgPool>) {
 //     {
@@ -49,60 +47,23 @@ struct ApiResponse<T>(StatusCode, Json<T>);
 //     }
 // }
 
-// have to rewrite.
-#[derive(FromRow, Debug)]
-struct SMemberModel {
-    // pub member_id: u32,
-    pub first_name: String,
-    pub middle_name: String,
-    pub family_name: String,
-    // pub date_of_birth: NaiveDate,
-    pub email: String,
-    pub password: String,
-    // pub created_at: NaiveDateTime,
-    // pub updated_at: NaiveDateTime,
-}
-
 async fn get_member(
     State(pool): State<PgPool>,
-    // Path((member_id, first_name)): Path<(u32, String)>,
-    Path(first_name): Path<String>,
+    Path(member_id): Path<i32>,
+    // Path(first_name): Path<String>,
 ) -> impl IntoResponse {
     {
-        // let row = sqlx::query_as("SELECT * FROM members WHERE member_id = $1")
-        //     .bind(member_id)
-        //     .fetch_one(&pool)
-        //     .await;
+        println!("path param member_id: {}", member_id);
 
-        let row =
-            sqlx::query_as::<Postgres, SMemberModel>("SELECT * FROM members WHERE first_name = $1")
-                .bind(first_name)
-                .fetch_one(&pool)
-                .await;
-        println!("{:#?}", row);
-        let member = row.unwrap();
+        let repo = FindMemberRepository { pool };
+        let use_case = FindMemberInteractor { repo };
 
-        // let output_data = CreateMemberController::create_member(
-        //     payload.family_name,
-        //     Some(payload.middle_name),
-        //     payload.first_name,
-        //     payload.pass_code,
-        // )
-        // .member;
-        let utc = Utc::now();
-        let output_data = MemberEntity {
-            member_id: 111,
-            first_name: member.first_name,
-            middle_name: member.middle_name,
-            family_name: member.family_name,
-            // date_of_birth: utc.date_naive(),
-            // email: member.email,
-            // password: member.password,
-            // created_at: utc.naive_utc(),
-            // updated_at: utc.naive_utc(),
-        };
+        let output_data = FindMemberController::find_member(use_case, member_id)
+            .await
+            .member;
 
-        (StatusCode::OK, Json(output_data))
+        let res: ApiResponse<MemberEntity> = (StatusCode::OK, Json(output_data));
+        res.into_response()
     }
 }
 
@@ -126,9 +87,8 @@ async fn create_member(
     )
     .member;
 
-    (StatusCode::CREATED, Json(output_data))
-    // ApiResponse(StatusCode::CREATED, Json(output_data)).into_response()
-    // Response::new((StatusCode::CREATED, Json(output_data)))
+    let member: ApiResponse<MemberEntity> = (StatusCode::CREATED, Json(output_data));
+    member
 }
 
 // remove here.
