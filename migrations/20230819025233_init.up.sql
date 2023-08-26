@@ -22,7 +22,7 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER timestamp_trg
+CREATE TRIGGER members_timestamp_trg
   BEFORE UPDATE
   ON members
   FOR EACH ROW
