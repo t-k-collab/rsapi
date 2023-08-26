@@ -28,3 +28,4 @@ CREATE TRIGGER family_members_timestamp_trg
   ON family_members
   FOR EACH ROW
   EXECUTE FUNCTION set_timestamp_trigger();
+  
