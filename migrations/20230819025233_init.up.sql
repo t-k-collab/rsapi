@@ -27,4 +27,3 @@ CREATE TRIGGER members_timestamp_trg
   ON members
   FOR EACH ROW
   EXECUTE FUNCTION set_timestamp_trigger();
-

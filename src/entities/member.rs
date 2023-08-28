@@ -9,6 +9,7 @@ pub struct MemberEntity {
     pub first_name: String,
     pub date_of_birth: String,
     pub email: String,
+    // pub family_ids: Vec<i32>,
 }
 
 impl MemberEntity {
