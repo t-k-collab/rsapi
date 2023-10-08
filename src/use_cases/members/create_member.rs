@@ -55,6 +55,7 @@ impl CreateMemberInteractor {
             model.first_name,
             model.date_of_birth,
             model.email,
+            vec![],
         );
 
         CreateMemberOutputData { member }

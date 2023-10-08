@@ -15,8 +15,12 @@ use crate::{
             create_member::CreateMemberController, find_member::FindMemberController,
         },
         repositories::members::find_member_repository::FindMemberRepository,
+        responses::CustomError,
     },
-    use_cases::members::{create_member::CreateMemberInputData, find_member::FindMemberInteractor},
+    use_cases::members::{
+        create_member::CreateMemberInputData,
+        find_member::{FindMemberInteractor, FindMemberOutputData},
+    },
 };
 
 pub fn init_router(pool: Pool<Postgres>) -> Router {
@@ -27,11 +31,20 @@ pub fn init_router(pool: Pool<Postgres>) -> Router {
         .with_state(pool)
 }
 
-type ApiResponse<T> = (StatusCode, Json<T>);
+pub type ApiResponse<T> = (StatusCode, Json<T>);
+pub type ApiErrResponse = (StatusCode, Json<CustomError>);
+
+// pub type TApiResponse<T> = (StatusCode, Json<JsonResponse<T>>);
+// pub type TApiErrResponse = (StatusCode, Json<JsonResponse<CustomError>>);
+// #[derive(Debug)]
+// pub enum APIResponse<T> {
+//     Normal((StatusCode, Json<JsonResponse<T>>)),
+//     Error((StatusCode, Json<JsonResponse<CustomError>>)),
+// }
 
 // REFACTOR move this and refactor later.
 #[derive(Debug, Deserialize, Serialize)]
-struct CustomError {
+struct SampleCustomError {
     msg: String,
 }
 
@@ -40,7 +53,7 @@ struct CustomError {
 struct Res<T> {
     res_body: Option<T>,
     is_err: bool,
-    err: Option<CustomError>,
+    err: Option<SampleCustomError>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -57,7 +70,7 @@ async fn health_check(State(pool): State<PgPool>) -> impl IntoResponse {
             let body = Res {
                 res_body: None,
                 is_err: true,
-                err: Some(CustomError {
+                err: Some(SampleCustomError {
                     msg: "error".to_string(),
                 }),
             };
@@ -94,7 +107,7 @@ async fn health_check(State(pool): State<PgPool>) -> impl IntoResponse {
                     let body = Res {
                         res_body: None,
                         is_err: true,
-                        err: Some(CustomError {
+                        err: Some(SampleCustomError {
                             msg: "error".to_string(),
                         }),
                     };
@@ -108,19 +121,69 @@ async fn health_check(State(pool): State<PgPool>) -> impl IntoResponse {
     }
 }
 
-async fn get_member(State(pool): State<PgPool>, Path(member_id): Path<i32>) -> impl IntoResponse {
+async fn get_member(
+    State(pool): State<PgPool>,
+    Path(member_id): Path<i32>,
+    // ) -> Result<impl IntoResponse, impl IntoResponse> {
+    // ) -> impl ResponseJson<MemberEntity> + ResponseJson<CustomError> {
+) -> impl IntoResponse {
     {
         println!("path param member_id: {}", member_id);
 
         let repo = FindMemberRepository { pool };
         let use_case = FindMemberInteractor { repo };
 
-        let output_data = FindMemberController::find_member(use_case, member_id)
-            .await
-            .member;
+        let output_data = FindMemberController::find_member(use_case, member_id).await;
 
-        let res: ApiResponse<MemberEntity> = (StatusCode::OK, Json(output_data));
-        res.into_response()
+        match output_data {
+            Ok(res) => (res.0, Json(res.1)).into_response(),
+            Err(e) => (e.0, Json(e.1)).into_response(),
+        }
+
+        // match a {
+        //     Ok(res) => res.into_response(),
+        //     Err(e) => e.into_response(),
+        // }
+
+        // before
+        // match output_data {
+        //     // Ok(n) => Ok(n),
+        //     // Err(e) => Err(e),
+        //     // Ok(n) => APIResponse::Normal(n),
+        //     // Err(e) => APIResponse::Error(e),
+        //     Ok(n) => {
+        //         let stc = n.0;
+        //         let s = n.1;
+        //         match s {
+        //             // JsonResponse::OK(member) => (stc, Json(member)).into_response(),
+        //             // JsonResponse::CustomError(e) => {
+        //             //     let t = CustomError::NotFoundError(e);
+        //             //     (stc, Json(t)).into_response()
+        //             // }
+        //             JsonResponse::OK(member) => Ok((stc, Json(member)).into_response()),
+        //             JsonResponse::CustomError(e) => {
+        //                 match e {
+        //                     CustomError::NotFoundError { msg } => {
+        //                         let t = SampleCustomError { msg };
+        //                         Ok((stc, Json(t)).into_response())
+        //                     }
+        //                     CustomError::InternalError { msg } => {
+        //                         let t = SampleCustomError { msg };
+        //                         Ok((stc, Json(t)).into_response())
+        //                     }
+        //                     _ => Err(e.into_response()),
+        //                 }
+        //                 // let t = e;
+        //                 // Ok((stc, Json(t)).into_response())
+        //             }
+        //         }
+        //         // (stc, Json(json))
+        //     }
+        //     Err(e) => Err(e.into_response()),
+        // }
+        // // println!("res: {:#?}", res);
+        // // res.into_response()
+        // // before until here.
     }
 }
 
