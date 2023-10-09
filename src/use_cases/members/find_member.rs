@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::{
     entities::member::{Family, MemberEntity},
@@ -46,11 +46,10 @@ impl FindMemberInteractor {
         match result {
             Ok(None) => return Ok(None), // here will not be passed?? If there are no members, it will return empty array [].
             Ok(Some(res)) => {
-                let families = if res.len() == 0 {
+                let families = if res.is_empty() {
                     return Ok(None);
                 } else {
                     res.iter()
-                        // .map(|mfi| (mfi.family_id, mfi.name.to_string()))
                         .map(|mfi| Family {
                             id: mfi.family_id,
                             name: mfi.name.to_string(),
@@ -58,6 +57,7 @@ impl FindMemberInteractor {
                         .collect()
                 };
 
+                // res[index_no] values must be same.
                 let member = MemberEntity::new(
                     res[0].member_id,
                     res[0].family_name.to_string(),

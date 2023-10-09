@@ -1,10 +1,5 @@
-use std::vec;
-
 use crate::{
-    interfaces::{
-        repositories::members::MemberWithFamilyInfoModel,
-        responses::{CustomError, SqlxError},
-    },
+    interfaces::{repositories::members::MemberWithFamilyInfoModel, responses::CustomError},
     use_cases::members::find_member::FindMemberInputData,
 };
 use sqlx::{Error as sqlxErr, Pool, Postgres};
@@ -16,6 +11,7 @@ pub struct FindMemberRepository {
 }
 
 impl FindMemberRepository {
+    // this is not called from anywhere yet.
     pub async fn find(&self, input: FindMemberInputData) -> MemberModel {
         println!("find a member data from db.");
         let row =
@@ -58,66 +54,13 @@ impl FindMemberRepository {
                 .await;
         println!("inner join result: {:#?}", &rows);
 
-        // REFACTOR Can be written in like this?
-        // let family_ids = rows
-        //     .iter()
-        //     .enumerate()
-        //     .map(|(i, row)| (&row[i].family_id, &row[i].name));
-        //     .collect::<Vec<(&i32, &String)>>();
-
-        // TODO error handling
-        // TODO ここのロジックはrepositoryに書くべきで無い気がする -> interactor
-        // let family_ids2 = match rows {
-        //     Ok(res) => {
-        //         let family_ids = res
-        //             .iter()
-        //             .map(|mfi| (mfi.family_id, mfi.name.to_string()))
-        //             .collect();
-        //         family_ids
-        //     }
-        //     Err(_) => vec![],
-        // };
-        // println!("get family_id result 0: {:#?}", family_ids2);
-
-        // MemberWithFamilyInfoModel {
-        //     member_id: member.member_id,
-        //     first_name: member.first_name,
-        //     middle_name: member.middle_name,
-        //     family_name: member.family_name,
-        //     date_of_birth: member.date_of_birth,
-        //     email: member.email,
-        //     password: member.password,
-        //     created_at: member.created_at,
-        //     updated_at: member.updated_at,
-        // }
-        // necessary impl
-
-        let res = match rows {
+        match rows {
             Ok(res) => Ok(Some(res)),
             Err(sqlxErr::RowNotFound) => Ok(None),
             Err(err) => Err(CustomError::SqlxError {
                 msg: err.to_string(), // REFACTOR Adjust error object.
             }),
-            // Err(err) => Err(SqlxError::DataBaseError(err)),
             // Other errors related to SqlxError?
-        };
-
-        // let res = if rows.is_err() {
-        //     return CustomError::DataBaseError(rows);
-        // } else {
-        //     // match rows.ok() {
-        //     //     Some(res) => res,
-        //     //     None => vec![],
-        //     // };
-        //     return rows.ok();
-        // };
-
-        // let res = match rows.ok() {
-        //     Some(res) => res,
-        //     None => vec![],
-        // };
-
-        // return value must be independent from database type.
-        res
+        }
     }
 }
