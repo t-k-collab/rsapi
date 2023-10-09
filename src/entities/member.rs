@@ -8,7 +8,7 @@ pub struct MemberEntity {
     pub middle_name: String,
     pub first_name: String,
     pub date_of_birth: String,
-    pub email: String,
+    pub email: String, // TODO value object
     pub families: Vec<Family>,
 }
 
