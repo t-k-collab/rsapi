@@ -29,6 +29,7 @@ use sqlx::Error as sqlxErr;
 // }
 
 #[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum CustomError {
     SqlxError { msg: String }, // ?? sqlxErr not used
     NotFoundError { msg: String },
