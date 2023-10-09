@@ -9,7 +9,13 @@ pub struct MemberEntity {
     pub first_name: String,
     pub date_of_birth: String,
     pub email: String,
-    pub family_ids: Vec<(i32, String)>, // which is better? families? or family_ids?
+    pub families: Vec<Family>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Family {
+    pub id: i32,
+    pub name: String,
 }
 
 impl MemberEntity {
@@ -20,7 +26,7 @@ impl MemberEntity {
         first_name: String,
         date_of_birth: NaiveDate,
         email: String,
-        family_ids: Vec<(i32, String)>,
+        families: Vec<Family>,
     ) -> Self {
         Self {
             member_id,
@@ -29,7 +35,7 @@ impl MemberEntity {
             first_name,
             date_of_birth: date_of_birth.to_string(),
             email,
-            family_ids,
+            families,
         }
     }
 }
