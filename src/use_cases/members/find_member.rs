@@ -1,8 +1,10 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::{
-    entities::member::MemberEntity,
-    interfaces::repositories::members::find_member_repository::FindMemberRepository,
+    entities::member::{Family, MemberEntity},
+    interfaces::{
+        repositories::members::find_member_repository::FindMemberRepository, responses::CustomError,
+    },
 };
 
 // DTO<Input>
@@ -21,29 +23,57 @@ impl FindMemberInputData {
 }
 
 // DTO<Output>
-#[derive(Debug, Serialize)]
-pub struct FindMemberOutputData {
-    pub member: MemberEntity,
-}
+// #[derive(Debug, Serialize)]
+// pub struct FindMemberOutputData {
+//     pub member: MemberEntity,
+// }
+
+pub type FindMemberOutputData = MemberEntity;
 
 pub struct FindMemberInteractor {
     pub repo: FindMemberRepository,
 }
 
 impl FindMemberInteractor {
-    pub async fn find_member(&self, input_data: FindMemberInputData) -> FindMemberOutputData {
+    pub async fn find_member(
+        &self,
+        input_data: FindMemberInputData,
+    ) -> Result<Option<FindMemberOutputData>, CustomError> {
         // Dependency Inversion
-        let model = self.repo.find(input_data).await;
+        // let result = self.repo.find(input_data).await;
+        let result = self.repo.find_with_family_info(input_data).await;
 
-        let member = MemberEntity::new(
-            model.member_id,
-            model.family_name,
-            model.middle_name,
-            model.first_name,
-            model.date_of_birth,
-            model.email,
-        );
+        match result {
+            Ok(None) => {
+                println!("get response None from repository find_with_family_info.");
+                Ok(None)
+            } // here will not be passed?? If there are no members, it will return empty array [].
+            Ok(Some(res)) => {
+                let families = if res.is_empty() {
+                    return Ok(None);
+                } else {
+                    res.iter()
+                        .map(|mfi| Family {
+                            id: mfi.family_id,
+                            name: mfi.name.to_string(),
+                        })
+                        .collect()
+                };
 
-        FindMemberOutputData { member }
+                // res[index_no] values must be same.
+                let member = MemberEntity::new(
+                    res[0].member_id,
+                    res[0].family_name.to_string(),
+                    res[0].middle_name.to_string(),
+                    res[0].first_name.to_string(),
+                    res[0].date_of_birth,
+                    res[0].email.to_string(),
+                    families,
+                );
+
+                Ok(Some(member))
+            }
+            Err(e) => Err(e),
+        }
     }
 }

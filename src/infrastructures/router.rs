@@ -1,6 +1,6 @@
 use axum::{
     extract::{Path, State},
-    http::{Error, StatusCode},
+    http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
@@ -27,11 +27,11 @@ pub fn init_router(pool: Pool<Postgres>) -> Router {
         .with_state(pool)
 }
 
-type ApiResponse<T> = (StatusCode, Json<T>);
+pub type ApiResponse<T> = (StatusCode, Json<T>);
 
 // REFACTOR move this and refactor later.
 #[derive(Debug, Deserialize, Serialize)]
-struct CustomError {
+struct SampleCustomError {
     msg: String,
 }
 
@@ -40,7 +40,7 @@ struct CustomError {
 struct Res<T> {
     res_body: Option<T>,
     is_err: bool,
-    err: Option<CustomError>,
+    err: Option<SampleCustomError>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -57,7 +57,7 @@ async fn health_check(State(pool): State<PgPool>) -> impl IntoResponse {
             let body = Res {
                 res_body: None,
                 is_err: true,
-                err: Some(CustomError {
+                err: Some(SampleCustomError {
                     msg: "error".to_string(),
                 }),
             };
@@ -94,7 +94,7 @@ async fn health_check(State(pool): State<PgPool>) -> impl IntoResponse {
                     let body = Res {
                         res_body: None,
                         is_err: true,
-                        err: Some(CustomError {
+                        err: Some(SampleCustomError {
                             msg: "error".to_string(),
                         }),
                     };
@@ -115,12 +115,12 @@ async fn get_member(State(pool): State<PgPool>, Path(member_id): Path<i32>) -> i
         let repo = FindMemberRepository { pool };
         let use_case = FindMemberInteractor { repo };
 
-        let output_data = FindMemberController::find_member(use_case, member_id)
-            .await
-            .member;
+        let output_data = FindMemberController::find_member(use_case, member_id).await;
 
-        let res: ApiResponse<MemberEntity> = (StatusCode::OK, Json(output_data));
-        res.into_response()
+        match output_data {
+            Ok(res) => (res.0, Json(res.1)).into_response(),
+            Err(e) => (e.0, Json(e.1)).into_response(),
+        }
     }
 }
 
