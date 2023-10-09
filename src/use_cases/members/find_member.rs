@@ -44,7 +44,10 @@ impl FindMemberInteractor {
         let result = self.repo.find_with_family_info(input_data).await;
 
         match result {
-            Ok(None) => return Ok(None), // here will not be passed?? If there are no members, it will return empty array [].
+            Ok(None) => {
+                println!("get response None from repository find_with_family_info.");
+                Ok(None)
+            } // here will not be passed?? If there are no members, it will return empty array [].
             Ok(Some(res)) => {
                 let families = if res.is_empty() {
                     return Ok(None);
