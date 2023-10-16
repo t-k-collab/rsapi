@@ -38,7 +38,6 @@ pub struct CreateMemberOutputData {
     pub member: MemberEntity,
 }
 
-// Use Case implementation
 pub struct CreateMemberInteractor {
     pub repo: CreateMemberRepository,
 }
@@ -46,7 +45,6 @@ pub struct CreateMemberInteractor {
 impl CreateMemberInteractor {
     pub fn create_member(&self, input_data: CreateMemberInputData) -> CreateMemberOutputData {
         // Dependency Inversion
-
         let model = self.repo.create(input_data);
 
         // TODO convert model to entity;
@@ -55,7 +53,9 @@ impl CreateMemberInteractor {
             model.family_name,
             model.middle_name,
             model.first_name,
-            model.pass_code,
+            model.date_of_birth,
+            model.email,
+            vec![],
         );
 
         CreateMemberOutputData { member }

@@ -1,32 +1,41 @@
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct MemberEntity {
-    pub member_id: u16,
+    pub member_id: i32,
     pub family_name: String,
     pub middle_name: String,
     pub first_name: String,
-    pub pass_code: String,
-    pub created: String, // TODO date type. time or chrono crate. // TODO this is only for model.
-    pub updated: String, // TODO date type. time or chrono crate. // TODO this is only for model.
+    pub date_of_birth: String,
+    pub email: String, // TODO value object
+    pub families: Vec<Family>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Family {
+    pub id: i32,
+    pub name: String,
 }
 
 impl MemberEntity {
     pub fn new(
-        member_id: u16,
+        member_id: i32,
         family_name: String,
         middle_name: String,
         first_name: String,
-        pass_code: String,
+        date_of_birth: NaiveDate,
+        email: String,
+        families: Vec<Family>,
     ) -> Self {
         Self {
             member_id,
             family_name,
             middle_name,
             first_name,
-            pass_code,
-            created: "20230720".to_string(), // TODO fill
-            updated: "20230720".to_string(), // TODO fill
+            date_of_birth: date_of_birth.to_string(),
+            email,
+            families,
         }
     }
 }

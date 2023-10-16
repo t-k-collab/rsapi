@@ -34,3 +34,10 @@ docker-compose up api
 
 to create `.sqlx`,
 `cargo sqlx prepare`
+
+## sqlx
+### migration
+
+#### sqlx
+`sqlx migrate run`
+`sqlx migrate revert`
