@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -11,7 +12,9 @@ pub struct CreateMemberInputData {
     pub family_name: String,
     pub middle_name: String,
     pub first_name: String,
-    pub pass_code: String,
+    pub date_of_birth: Option<NaiveDate>,
+    pub email: String,
+    pub password: String,
     // pub email: Email // TODO Value Object.
 }
 
@@ -21,31 +24,33 @@ impl CreateMemberInputData {
         family_name: String,
         middle_name: Option<String>,
         first_name: String,
-        pass_code: String,
+        date_of_birth: Option<NaiveDate>,
+        email: String,
+        password: String,
     ) -> Self {
         Self {
             family_name,
             middle_name: middle_name.unwrap_or_default(), // Application Logic.
             first_name,
-            pass_code,
+            password,
+            date_of_birth,
+            email,
         }
     }
 }
 
 // DTO<Output>
-#[derive(Debug, Serialize)]
-pub struct CreateMemberOutputData {
-    pub member: MemberEntity,
-}
+
+pub type CreateMemberOutputData = MemberEntity;
 
 pub struct CreateMemberInteractor {
     pub repo: CreateMemberRepository,
 }
 
 impl CreateMemberInteractor {
-    pub fn create_member(&self, input_data: CreateMemberInputData) -> CreateMemberOutputData {
+    pub async fn create_member(&self, input_data: CreateMemberInputData) -> CreateMemberOutputData {
         // Dependency Inversion
-        let model = self.repo.create(input_data);
+        let model = self.repo.create(input_data).await;
 
         // TODO convert model to entity;
         let member = MemberEntity::new(
@@ -58,6 +63,6 @@ impl CreateMemberInteractor {
             vec![],
         );
 
-        CreateMemberOutputData { member }
+        member
     }
 }

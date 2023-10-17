@@ -14,9 +14,15 @@ use crate::{
         controllers::members::{
             create_member::CreateMemberController, find_member::FindMemberController,
         },
-        repositories::members::find_member_repository::FindMemberRepository,
+        repositories::members::{
+            create_member_repository::CreateMemberRepository,
+            find_member_repository::FindMemberRepository,
+        },
     },
-    use_cases::members::{create_member::CreateMemberInputData, find_member::FindMemberInteractor},
+    use_cases::members::{
+        create_member::{CreateMemberInputData, CreateMemberInteractor},
+        find_member::FindMemberInteractor,
+    },
 };
 
 pub fn init_router(pool: Pool<Postgres>) -> Router {
@@ -125,24 +131,32 @@ async fn get_member(State(pool): State<PgPool>, Path(member_id): Path<i32>) -> i
 }
 
 async fn create_member(
-    State(_pool): State<PgPool>,
+    State(pool): State<PgPool>,
     Json(payload): Json<CreateMemberInputData>,
 ) -> impl IntoResponse {
     println!(
-        "payload: {}, {:?}, {}, {}",
+        "payload: {}, {:?}, {}, {:?}, {}, {}",
         payload.family_name,
         Some(&payload.middle_name),
         payload.first_name,
-        payload.pass_code
+        Some(&payload.date_of_birth),
+        payload.email,
+        payload.password,
     );
 
+    let repo = CreateMemberRepository { pool };
+    let use_case = CreateMemberInteractor { repo };
+
     let output_data = CreateMemberController::create_member(
+        use_case,
         payload.family_name,
         Some(payload.middle_name),
         payload.first_name,
-        payload.pass_code,
+        payload.date_of_birth,
+        payload.email,
+        payload.password,
     )
-    .member;
+    .await;
 
     let member: ApiResponse<MemberEntity> = (StatusCode::CREATED, Json(output_data));
     member
