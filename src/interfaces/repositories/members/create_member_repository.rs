@@ -18,7 +18,7 @@ impl CreateMemberRepository {
         println!("inserting a member data into db.");
         // TODO crate data on DB and fetch them.
         // self.access_db();
-        let row = sqlx::query_as::<Postgres, MemberModel>(
+        let row = sqlx::query(
             "INSERT INTO members (
                 first_name,
                 middle_name,
@@ -41,7 +41,7 @@ impl CreateMemberRepository {
         .bind(input.date_of_birth)
         .bind(input.email)
         .bind(input.password)
-        .fetch_one(&self.pool)
+        .execute(&self.pool)
         .await;
         println!("create a member result: {:#?}", row);
 
