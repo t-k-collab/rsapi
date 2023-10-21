@@ -16,8 +16,7 @@ pub struct CreateMemberRepository {
 impl CreateMemberRepository {
     pub async fn create(&self, input: CreateMemberInputData) -> MemberModel {
         println!("inserting a member data into db.");
-        // TODO crate data on DB and fetch them.
-        // self.access_db();
+
         let row = sqlx::query(
             "INSERT INTO members (
                 first_name,
@@ -35,15 +34,26 @@ impl CreateMemberRepository {
                 $6
                 )",
         )
-        .bind(input.family_name)
-        .bind(input.middle_name)
-        .bind(input.first_name)
+        .bind(&input.first_name)
+        .bind(&input.middle_name)
+        .bind(&input.family_name)
         .bind(input.date_of_birth)
-        .bind(input.email)
-        .bind(input.password)
+        .bind(&input.email)
+        .bind(&input.password)
         .execute(&self.pool)
         .await;
         println!("create a member result: {:#?}", row);
+
+        // TODO get member call find_member repository
+        let find_row = sqlx::query_as::<Postgres, MemberModel>(
+            "SELECT * FROM members WHERE email = $1 AND first_name = $2 AND family_name = $3",
+        )
+        .bind(&input.email)
+        .bind(&input.first_name)
+        .bind(&input.family_name)
+        .fetch_one(&self.pool)
+        .await;
+        println!("find a member after creating a member result: {:#?}", row);
 
         // TODO implement Later
         let utc = Utc::now();
