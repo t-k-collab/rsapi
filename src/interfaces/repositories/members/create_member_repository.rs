@@ -16,6 +16,9 @@ pub struct CreateMemberRepository {
 impl CreateMemberRepository {
     pub async fn create(&self, input: CreateMemberInputData) -> MemberModel {
         println!("inserting a member data into db.");
+        // TODO remove unwrap and handle Result
+        // let mut tx = self.pool.begin().await;
+        let tx = self.pool.begin().await.unwrap();
 
         let row = sqlx::query(
             "INSERT INTO members (
@@ -54,6 +57,8 @@ impl CreateMemberRepository {
         .fetch_one(&self.pool)
         .await;
         println!("find a member after creating a member result: {:#?}", row);
+
+        let _ = tx.commit().await;
 
         // TODO implement Later
         let utc = Utc::now();
