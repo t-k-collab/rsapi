@@ -1,9 +1,9 @@
 use crate::{
-    interfaces::repositories::members::MemberModel,
+    interfaces::{repositories::members::MemberModel, responses::CustomError},
     use_cases::members::create_member::CreateMemberInputData,
 };
 use chrono::Utc;
-use sqlx::{Pool, Postgres};
+use sqlx::{Error as sqlxErr, Pool, Postgres};
 
 pub struct CreateMemberRepository {
     pub pool: Pool<Postgres>,
@@ -14,8 +14,12 @@ pub struct CreateMemberRepository {
 // }
 
 impl CreateMemberRepository {
-    pub async fn create(&self, input: CreateMemberInputData) -> MemberModel {
+    pub async fn create(
+        &self,
+        input: CreateMemberInputData,
+    ) -> Result<Option<MemberModel>, CustomError> {
         println!("inserting a member data into db.");
+
         // TODO remove unwrap and handle Result
         // let mut tx = self.pool.begin().await;
         let tx = self.pool.begin().await.unwrap();
@@ -60,18 +64,13 @@ impl CreateMemberRepository {
 
         let _ = tx.commit().await;
 
-        // TODO implement Later
-        let utc = Utc::now();
-        MemberModel {
-            member_id: 1,
-            family_name: "input.family_name".to_string(),
-            middle_name: "input.middle_name".to_string(),
-            first_name: "input.first_name".to_string(),
-            date_of_birth: utc.date_naive(),
-            email: "member@email.com".to_string(),
-            password: "password".to_string(),
-            created_at: utc.naive_utc(),
-            updated_at: utc.naive_utc(),
+        match find_row {
+            Ok(res) => Ok(Some(res)),
+            Err(sqlxErr::RowNotFound) => Ok(None),
+            Err(err) => Err(CustomError::SqlxError {
+                msg: err.to_string(), // REFACTOR Adjust error object.
+            }),
+            // Other errors related to SqlxError?
         }
     }
 }
