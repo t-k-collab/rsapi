@@ -49,6 +49,7 @@ pub struct CreateMemberInteractor {
 
 impl CreateMemberInteractor {
     pub async fn create_member(&self, input_data: CreateMemberInputData) -> CreateMemberOutputData {
+        // pub async fn create_member(&self, input_data: CreateMemberInputData) ->   Result<Option<CreateMemberOutputData>, CustomError>{
         // Dependency Inversion
         let model = self.repo.create(input_data).await;
 
