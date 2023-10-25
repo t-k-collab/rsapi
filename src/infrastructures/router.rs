@@ -135,13 +135,15 @@ async fn create_member(
     Json(payload): Json<CreateMemberInputData>,
 ) -> impl IntoResponse {
     println!(
-        "payload: {}, {:?}, {}, {:?}, {}, {}",
+        "payload: {}, {:?}, {}, {:?}, {}, {}, {}, {}",
         payload.family_name,
         Some(&payload.middle_name),
         payload.first_name,
         Some(&payload.date_of_birth),
         payload.email,
         payload.password,
+        payload.family_unit_name,
+        payload.family_unit_pass_code
     );
 
     let repo = CreateMemberRepository { pool };
@@ -155,6 +157,8 @@ async fn create_member(
         payload.date_of_birth,
         payload.email,
         payload.password,
+        payload.family_unit_name,
+        payload.family_unit_pass_code,
     )
     .await;
 

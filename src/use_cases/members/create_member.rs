@@ -13,9 +13,10 @@ pub struct CreateMemberInputData {
     pub middle_name: String,
     pub first_name: String,
     pub date_of_birth: Option<NaiveDate>,
-    pub email: String,
-    pub password: String,
-    // pub email: Email // TODO Value Object.
+    pub email: String,    // TODO Value Object.
+    pub password: String, // TODO Value Object.
+    pub family_unit_name: String,
+    pub family_unit_pass_code: String, // TODO Value Object.
 }
 
 // validation, initializing
@@ -27,6 +28,8 @@ impl CreateMemberInputData {
         date_of_birth: Option<NaiveDate>,
         email: String,
         password: String,
+        family_unit_name: String,
+        family_unit_pass_code: String,
     ) -> Self {
         Self {
             family_name,
@@ -35,6 +38,8 @@ impl CreateMemberInputData {
             password,
             date_of_birth,
             email,
+            family_unit_name,
+            family_unit_pass_code,
         }
     }
 }

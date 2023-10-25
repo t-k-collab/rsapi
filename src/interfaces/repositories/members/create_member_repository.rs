@@ -61,6 +61,20 @@ impl CreateMemberRepository {
         println!("find a member after creating a member result: {:#?}", row);
 
         // TODO create family record
+        let family_row = sqlx::query(
+            "INSERT INTO families (
+                name,
+                pass_code
+                ) VALUES (
+                $1,
+                $2
+                )",
+        )
+        .bind(&input.family_unit_name)
+        .bind(&input.family_unit_pass_code)
+        .execute(&self.pool)
+        .await;
+        println!("create a family record: {:#?}", family_row);
         // TODO fetch family info or family_id
         // let family =
         // TODO create family_member record with member_id and family_id
