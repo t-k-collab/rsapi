@@ -1,5 +1,8 @@
 use crate::{
-    interfaces::{repositories::members::MemberModel, responses::CustomError},
+    interfaces::{
+        repositories::members::{FamilyModel, MemberModel},
+        responses::CustomError,
+    },
     use_cases::members::create_member::CreateMemberInputData,
 };
 use chrono::Utc;
@@ -60,7 +63,7 @@ impl CreateMemberRepository {
         .await;
         println!("find a member after creating a member result: {:#?}", row);
 
-        // TODO create family record
+        // TODO create family record using use_case in controller
         let family_row = sqlx::query(
             "INSERT INTO families (
                 name,
@@ -75,7 +78,21 @@ impl CreateMemberRepository {
         .execute(&self.pool)
         .await;
         println!("create a family record: {:#?}", family_row);
+
         // TODO fetch family info or family_id
+        let created_family_rows = sqlx::query_as::<Postgres, FamilyModel>(
+            "
+        select family_id, name
+        from families
+        where name = $1 and pass_code = $2
+        ",
+        )
+        .bind(input.family_unit_name)
+        .bind(input.family_unit_pass_code)
+        .fetch_all(&self.pool)
+        .await;
+        println!("select from family result: {:#?}", &created_family_rows);
+
         // let family =
         // TODO create family_member record with member_id and family_id
 

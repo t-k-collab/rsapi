@@ -29,3 +29,9 @@ pub struct MemberWithFamilyInfoModel {
     pub family_id: i32,
     pub name: String,
 }
+
+#[derive(FromRow, Debug, Serialize)]
+pub struct FamilyModel {
+    pub family_id: i32,
+    pub name: String,
+}

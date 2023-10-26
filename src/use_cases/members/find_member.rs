@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use crate::{
-    entities::member::{Family, MemberEntity},
+    entities::member::{FamilyEntity, MemberEntity},
     interfaces::{
         repositories::members::find_member_repository::FindMemberRepository, responses::CustomError,
     },
@@ -53,7 +53,7 @@ impl FindMemberInteractor {
                     return Ok(None);
                 } else {
                     res.iter()
-                        .map(|mfi| Family {
+                        .map(|mfi| FamilyEntity {
                             id: mfi.family_id,
                             name: mfi.name.to_string(),
                         })

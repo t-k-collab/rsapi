@@ -9,11 +9,11 @@ pub struct MemberEntity {
     pub first_name: String,
     pub date_of_birth: String,
     pub email: String, // TODO value object
-    pub families: Vec<Family>,
+    pub families: Vec<FamilyEntity>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Family {
+pub struct FamilyEntity {
     pub id: i32,
     pub name: String,
 }
@@ -26,7 +26,7 @@ impl MemberEntity {
         first_name: String,
         date_of_birth: NaiveDate,
         email: String,
-        families: Vec<Family>,
+        families: Vec<FamilyEntity>,
     ) -> Self {
         Self {
             member_id,
