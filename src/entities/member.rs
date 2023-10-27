@@ -7,7 +7,7 @@ pub struct MemberEntity {
     pub family_name: String,
     pub middle_name: String,
     pub first_name: String,
-    pub date_of_birth: String,
+    pub date_of_birth: Option<NaiveDate>,
     pub email: String, // TODO value object
     pub families: Vec<FamilyEntity>,
 }
@@ -24,7 +24,7 @@ impl MemberEntity {
         family_name: String,
         middle_name: String,
         first_name: String,
-        date_of_birth: NaiveDate,
+        date_of_birth: Option<NaiveDate>,
         email: String,
         families: Vec<FamilyEntity>,
     ) -> Self {
@@ -33,7 +33,7 @@ impl MemberEntity {
             family_name,
             middle_name,
             first_name,
-            date_of_birth: date_of_birth.to_string(),
+            date_of_birth,
             email,
             families,
         }

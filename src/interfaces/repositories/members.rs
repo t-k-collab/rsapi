@@ -11,7 +11,7 @@ pub struct MemberModel {
     pub first_name: String,
     pub middle_name: String,
     pub family_name: String,
-    pub date_of_birth: NaiveDate,
+    pub date_of_birth: Option<NaiveDate>,
     pub email: String,
     pub password: String,
     pub created_at: NaiveDateTime,

@@ -66,7 +66,7 @@ impl FindMemberInteractor {
                     res[0].family_name.to_string(),
                     res[0].middle_name.to_string(),
                     res[0].first_name.to_string(),
-                    res[0].date_of_birth,
+                    Some(res[0].date_of_birth),
                     res[0].email.to_string(),
                     families,
                 );

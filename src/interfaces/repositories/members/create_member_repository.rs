@@ -61,7 +61,10 @@ impl CreateMemberRepository {
         .bind(&input.family_name)
         .fetch_one(&self.pool)
         .await;
-        println!("find a member after creating a member result: {:#?}", row);
+        println!(
+            "find a member after creating a member result: {:#?}",
+            &find_row
+        );
 
         // TODO create family record using use_case in controller
         let family_row = sqlx::query(
@@ -95,6 +98,7 @@ impl CreateMemberRepository {
 
         // let family =
         // TODO create family_member record with member_id and family_id
+        // if created_family_rows() {}
 
         let _ = tx.commit().await;
 
@@ -115,7 +119,7 @@ impl CreateMemberRepository {
             family_name: "input.family_name".to_string(),
             middle_name: "input.middle_name".to_string(),
             first_name: "input.first_name".to_string(),
-            date_of_birth: utc.date_naive(),
+            date_of_birth: Some(utc.date_naive()),
             email: "member@email.com".to_string(),
             password: "password".to_string(),
             created_at: utc.naive_utc(),
