@@ -92,7 +92,7 @@ impl CreateMemberRepository {
         )
         .bind(input.family_unit_name)
         .bind(input.family_unit_pass_code)
-        .fetch_all(&self.pool)
+        .fetch_one(&self.pool)
         .await;
         println!("select from family result: {:#?}", &created_family_rows);
 
