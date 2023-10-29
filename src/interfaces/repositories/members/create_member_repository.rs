@@ -96,14 +96,53 @@ impl CreateMemberRepository {
         .await;
         println!("select from family result: {:#?}", &created_family_rows);
 
-        // let family =
+        let family_id = &created_family_rows.unwrap().family_id;
+        let member_id = find_row.as_ref().unwrap().member_id;
+        let family_member_row = sqlx::query(
+            "INSERT INTO family_members (
+                family_member_id,
+                family_id,
+                member_id
+                ) VALUES (
+                $1,
+                $2,
+                $3
+                )",
+        )
+        .bind(format!("f{}m{}", family_id, member_id))
+        .bind(family_id)
+        .bind(member_id)
+        .execute(&self.pool)
+        .await;
+        println!("create a family_members record: {:#?}", family_member_row);
+
+        // let family_id = if !created_family_rows.is_err() {
+        //     created_family_rows.unwrap().family_id
+        // };
+
         // TODO create family_member record with member_id and family_id
-        // if created_family_rows() {}
+        // let family_member_row = sqlx::query(
+        //     "INSERT INTO family_members (
+        //         family_member_id,
+        //         family_id,
+        //         member_id
+        //         ) VALUES (
+        //         $1,
+        //         $2,
+        //         $3
+        //         )",
+        // )
+        // .bind(format!("f{}m{}", family_id, member_id))
+        // .bind(member_id)
+        // .bind(family_id)
+        // .execute(&self.pool)
+        // .await;
+        println!("create a family_member record: {:#?}", family_member_row);
 
         let _ = tx.commit().await;
 
         // TODO return Result
-        match find_row {
+        match find_row.as_ref() {
             Ok(res) => Ok(Some(res)),
             Err(sqlxErr::RowNotFound) => Ok(None),
             Err(err) => Err(CustomError::SqlxError {
